@@ -1,0 +1,208 @@
+<html lang="en">
+<head>
+  <title>Clockwork</title>
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <style>
+  body {
+    padding:0;
+    margin:0;
+    font-family: 'Roboto', sans-serif;
+    background:#f8f8f8;
+  }
+  .cf:before,
+  .cf:after {
+      content:" ";
+      display:table;
+  }
+  .cf:after {
+      clear:both;
+  }
+  .cf {
+      *zoom:1;
+  }
+
+  nav {
+    background:#404040;
+    padding:5px;
+  }
+  input {
+    padding: .5em;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2em;
+    font-weight: 100;
+    border:none;
+    opacity:0.5;
+    background:#262626;
+    color:#f6f6f6;
+  }
+  input:focus {
+    opacity:1;
+    outline:none;
+  }
+
+  .clock,
+  .content,
+  .time,
+  input {
+    -webkit-transition: .3s;
+       -moz-transition: .3s;
+        -ms-transition: .3s;
+         -o-transition: .3s;
+            transition: .3s;
+  }
+  .clock {
+    padding:1em;
+    background:#eaeef0;
+  }
+  .clock:nth-child(2n) {
+    background:white;
+  }
+  .content {
+    float:left;
+    color:#404040;
+  }
+  .timer-id,
+  .duration {
+    color:#888;
+    text-transform:uppercase;
+    letter-spacing: .1em;
+    font-size:.7em;
+  }
+  .duration {
+    color:#6e9fb0;
+  }
+  .time {
+    float:right;
+    font-weight:900;
+    color:#39444c;
+    font-size:2em;
+  }
+
+  .finishing .time {
+    color: #afc100;
+  }
+  .finished {
+    opacity:.4;
+  }
+  .finished .content, .finished .time {
+    text-decoration: line-through;
+  }
+  </style>
+</head>
+<body>
+  <nav>
+    <input id="input-action" type="text" placeholder="Action...">
+    <input id="input-time" type="number" placeholder="Minutes"><br>
+  </nav>
+
+  <section id="clocks">
+  </section>
+
+  <script>
+  var Clockwork = function ( options ) {
+    this.options = options || {};
+    this.clocks = {
+      dom: document.getElementById('clocks'),
+      list: []
+    };
+    this.id_meter = 1;
+    this.inputs = {};
+    this.inputs.time = document.getElementById('input-time');
+    this.inputs.action = document.getElementById('input-action');
+
+    var that = this;
+
+    addEventListeners();
+    function addEventListeners() {
+      that.inputs.time.onkeypress = submit;
+      that.inputs.action.onkeypress = submit;
+    }
+
+    function submit( event ) {
+      if ( event.keyCode == 13 && that.inputs.time.value) {
+        that.create(that.inputs.time.value, that.inputs.action.value);
+        that.inputs.action.value = '';
+        that.inputs.time.value = '';   
+      }
+    }
+  }
+
+  Clockwork.prototype.create = function ( minutes, action ) {
+    
+    var id = this.id_meter;
+
+    // clock object
+    var clock = {};
+    clock.original_value = minutes;
+    clock.id = id;
+    clock.creation_time = Date()
+
+    // clock DOM element
+    var element = document.createElement('div');
+    element.className = 'clock cf';
+    element.id = id;
+    element.innerHTML = '<div class="content"><span class="timer-id">Timer ' + id + ', </span><span class="duration">'+minutes+' minutes</span><br><strong>'+action+'</strong></div>';
+
+    // clock timer (with own setTimeout);
+    var timer = document.createElement('span');
+    timer.setAttribute('data-clock', id);
+    timer.className = 'time';
+
+    var m = minutes;
+    var sec = m * 60;
+    timer.innerHTML = time(sec); // first innerHTML, then start timer 
+    sec--;
+    var timerInterval = setInterval(function(){
+
+      timer.innerHTML = time(sec);
+      sec--;
+
+      if ( sec < 0 ) {
+        clearTimeout(timerInterval);
+        finished();
+      }
+
+    }, 1000);
+
+    function time(s) {
+      var min = Math.floor(s / 60);
+      var seconds = s % 60;
+      if (seconds < 10) {
+        seconds = '0' + seconds;
+      }
+      var time = min + ':' + seconds;
+      return time;
+    }
+
+    function finished() {
+      element.className += ' finishing';
+      setTimeout(function(){
+        element.className = element.className.replace(/\bfinishing\b/, 'finished');
+      }, 3000)
+    }
+
+    element.appendChild(timer);
+    
+    // setInterval()
+
+    this.clocks.list.push(clock);
+    this.clocks.dom.appendChild(element);
+    this.id_meter++;
+    console.log(this, clocks);
+  }
+
+  function init() {
+    window.app = new Clockwork();
+  }
+  window.onload = init();
+  var popit = true;
+  window.onbeforeunload = function() { 
+    if(popit == true) {
+      popit = false;
+      return "Hold your clocks!";
+    }
+  }
+  </script>
+</body>
+</html>
