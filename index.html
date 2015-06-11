@@ -21,6 +21,10 @@
   .cf {
       *zoom:1;
   }
+  #sound {
+    opacity:0;
+    visibility:hidden;
+  }
 
   nav {
     background:#404040;
@@ -112,6 +116,8 @@
   <section id="clocks">
   </section>
 
+  <div id="sound"></div>
+
   <script>
   var Clockwork = function ( options ) {
     this.options = options || {};
@@ -190,6 +196,10 @@
 
     function finished() {
       element.className += ' finishing';
+
+      // play sound element
+      document.getElementById("sound").innerHTML='<audio autoplay="autoplay"><source src="alert.mp3" type="audio/mpeg" /><source src="alert.ogg" type="audio/ogg" /><embed hidden="true" autostart="true" loop="false" src="alert.mp3" /></audio>';
+
       setTimeout(function(){
         element.className = element.className.replace(/\bfinishing\b/, 'finished');
       }, 3000)
