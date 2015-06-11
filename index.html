@@ -25,6 +25,7 @@
   nav {
     background:#404040;
     padding:5px;
+    position:relative;
   }
   input {
     padding: .5em;
@@ -39,6 +40,16 @@
   input:focus {
     opacity:1;
     outline:none;
+  }
+
+  .logo {
+    position:absolute;
+    right:12px;
+    top:10px;
+  }
+  .logo .fa {
+    font-size:2em;
+    color:#00a5d5;
   }
 
   .clock,
@@ -94,6 +105,8 @@
   <nav>
     <input id="input-action" type="text" placeholder="Action...">
     <input id="input-time" type="number" placeholder="Minutes"><br>
+
+    <div class="logo"><i class="fa fa-clock-o"></i></div>
   </nav>
 
   <section id="clocks">
